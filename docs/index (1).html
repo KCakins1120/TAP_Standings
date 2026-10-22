@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Summit League Women's Volleyball Standings</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0a0a0a;
+      color: #e8e8e8;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    header p.subtitle {
+      margin-top: 0.4rem;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    .card {
+      max-width: 680px;
+      margin: 0 auto;
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 1.2rem;
+      background: #1e1e1e;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .card-header h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #fff;
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .badge-ok     { background: #14532d; color: #4ade80; }
+    .badge-stale  { background: #713f12; color: #fbbf24; }
+    .badge-error  { background: #450a0a; color: #f87171; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      padding: 0.6rem 1rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      text-align: left;
+      border-bottom: 1px solid #2a2a2a;
+      background: #111;
+    }
+
+    thead th.num {
+      text-align: center;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #1e1e1e;
+      transition: background 0.15s;
+    }
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+    tbody tr:hover {
+      background: #1f1f1f;
+    }
+
+    td {
+      padding: 0.65rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    td.rank {
+      color: #555;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+      width: 2.5rem;
+    }
+
+    td.team {
+      font-weight: 600;
+      color: #f0f0f0;
+    }
+
+    td.record {
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      color: #ccc;
+      width: 7rem;
+    }
+
+    .updated {
+      padding: 0.55rem 1.2rem;
+      font-size: 0.72rem;
+      color: #555;
+      border-top: 1px solid #1e1e1e;
+      text-align: right;
+    }
+
+    .message {
+      padding: 2rem;
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Summit League Women's Volleyball</h1>
+    <p class="subtitle">Standings updated automatically via GitHub Actions</p>
+  </header>
+
+  <div class="card" id="standings-card">
+    <div class="card-header">
+      <h2 id="standings-title">Standings</h2>
+      <span class="badge" id="standings-badge">Loading…</span>
+    </div>
+    <div id="standings-body">
+      <p class="message">Loading standings…</p>
+    </div>
+  </div>
+
+  <script>
+    async function loadData() {
+      let data;
+      try {
+        const res = await fetch("data.json?_=" + Date.now());
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        data = await res.json();
+      } catch (e) {
+        document.getElementById("standings-body").innerHTML =
+          `<p class="message">Could not load data.json: ${e.message}</p>`;
+        document.getElementById("standings-badge").textContent = "Error";
+        document.getElementById("standings-badge").className = "badge badge-error";
+        return;
+      }
+
+      renderStandings(data.standings);
+    }
+
+    function renderStandings(s) {
+      const badge  = document.getElementById("standings-badge");
+      const body   = document.getElementById("standings-body");
+      const title  = document.getElementById("standings-title");
+
+      if (!s || s.status === "error" || !s.rows || s.rows.length === 0) {
+        badge.textContent = "Unavailable";
+        badge.className   = "badge badge-error";
+        body.innerHTML    = `<p class="message">Standings could not be loaded.</p>`;
+        return;
+      }
+
+      // Title from scraper
+      if (s.name) title.textContent = s.name;
+
+      // Badge
+      if (s.status === "stale") {
+        badge.textContent = "⚠ Stale";
+        badge.className   = "badge badge-stale";
+      } else {
+        badge.textContent = "Live";
+        badge.className   = "badge badge-ok";
+      }
+
+      // Table — only Conf W-L and Overall W-L
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th class="num">#</th>
+              <th>Team</th>
+              <th class="num">Conf W-L</th>
+              <th class="num">Overall W-L</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      for (const row of s.rows) {
+        html += `
+          <tr>
+            <td class="rank">${row.rank}</td>
+            <td class="team">${escHtml(row.team)}</td>
+            <td class="record">${escHtml(row.conf)}</td>
+            <td class="record">${escHtml(row.ovr)}</td>
+          </tr>
+        `;
+      }
+
+      html += `</tbody></table>`;
+
+      // Updated-at footer
+      if (s.updated_at) {
+        const d = new Date(s.updated_at);
+        html += `<div class="updated">Updated ${d.toLocaleString(undefined, {
+          month: "short", day: "numeric", year: "numeric",
+          hour: "numeric", minute: "2-digit", timeZoneName: "short"
+        })}</div>`;
+      }
+
+      body.innerHTML = html;
+    }
+
+    function escHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    loadData();
+  </script>
+
+</body>
+</html>
