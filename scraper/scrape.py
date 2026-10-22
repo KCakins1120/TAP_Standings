@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 
 URL = "https://thesummitleague.org/standings.aspx?path=wvball"
-OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "..", "site", "data.json")
+OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "..", "docs", "data.json")
 
 def scrape_standings():
     with sync_playwright() as p:
