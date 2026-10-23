@@ -18,20 +18,20 @@
       {
         "rank": 3,
         "team": "Omaha",
-        "conf": "5-2",
-        "ovr": "11-6"
+        "conf": "5-3",
+        "ovr": "11-7"
       },
       {
         "rank": 4,
         "team": "St. Thomas",
-        "conf": "4-3",
-        "ovr": "6-10"
+        "conf": "5-3",
+        "ovr": "7-10"
       },
       {
         "rank": 5,
         "team": "North Dakota State",
-        "conf": "3-4",
-        "ovr": "11-6"
+        "conf": "4-4",
+        "ovr": "12-6"
       },
       {
         "rank": 6,
@@ -42,8 +42,8 @@
       {
         "rank": 7,
         "team": "North Dakota",
-        "conf": "1-6",
-        "ovr": "7-11"
+        "conf": "1-7",
+        "ovr": "7-12"
       },
       {
         "rank": 8,
@@ -53,7 +53,7 @@
       }
     ],
     "status": "ok",
-    "updated_at": "2026-10-22T19:59:48+00:00"
+    "updated_at": "2026-10-23T14:37:35+00:00"
   },
-  "generated_at": "2026-10-22T19:59:48+00:00"
+  "generated_at": "2026-10-23T14:37:35+00:00"
 }
