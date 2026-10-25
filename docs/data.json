@@ -18,42 +18,42 @@
       {
         "rank": 3,
         "team": "Omaha",
-        "conf": "5-3",
-        "ovr": "11-7"
+        "conf": "6-3",
+        "ovr": "12-7"
       },
       {
         "rank": 4,
         "team": "St. Thomas",
-        "conf": "5-3",
-        "ovr": "7-10"
+        "conf": "6-3",
+        "ovr": "8-10"
       },
       {
         "rank": 5,
-        "team": "North Dakota State",
+        "team": "Kansas City",
         "conf": "4-4",
-        "ovr": "12-6"
+        "ovr": "10-10"
       },
       {
         "rank": 6,
-        "team": "Kansas City",
-        "conf": "3-4",
-        "ovr": "9-10"
+        "team": "North Dakota State",
+        "conf": "4-5",
+        "ovr": "12-7"
       },
       {
         "rank": 7,
         "team": "North Dakota",
-        "conf": "1-7",
-        "ovr": "7-12"
+        "conf": "1-8",
+        "ovr": "7-13"
       },
       {
         "rank": 8,
         "team": "Oral Roberts",
-        "conf": "0-7",
-        "ovr": "6-12"
+        "conf": "0-8",
+        "ovr": "6-13"
       }
     ],
     "status": "ok",
-    "updated_at": "2026-10-24T14:13:13+00:00"
+    "updated_at": "2026-10-25T14:14:11+00:00"
   },
-  "generated_at": "2026-10-24T14:13:13+00:00"
+  "generated_at": "2026-10-25T14:14:11+00:00"
 }
