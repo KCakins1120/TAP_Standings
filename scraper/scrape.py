@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """
 Fetch standings from multiple Summit League, PFL, and NCHC sports pages.
-Extracts Team, Conference record (W-L), Overall record (W-L) for all sports.
-For MSOC and WSOC, also extracts CPTS (conference points).
-For WSOC, skips the Pods table and uses the full 8-team table.
+Extracts:
+  - Team Name & Team Acronym
+  - Conference record (W-L)
+  - Overall record (W-L)
+  - CPTS for MSOC & WSOC (Summit League Soccer points)
+  - PTS for NCHC Men's Ice Hockey points
+  - Skips Pods table for WSOC and pulls the full 8-team table
 
 Writes structured output to docs/data.json.
 
@@ -18,7 +22,6 @@ Usage:
 import argparse
 import datetime as dt
 import json
-import os
 import re
 import sys
 from pathlib import Path
@@ -27,69 +30,114 @@ from bs4 import BeautifulSoup
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
+# ── Team Acronym Translation Map ──────────────────────────────────────────────
+TEAM_ACRONYMS = {
+    # ── Summit League ─────────────────────────────────────────────────────────
+    "North Dakota":             "UND",
+    "North Dakota State":       "NDSU",
+    "South Dakota":             "USD",
+    "South Dakota State":       "SDSU",
+    "Kansas City":              "UMKC",
+    "Omaha":                    "OMA",
+    "Nebraska Omaha":           "OMA",
+    "St. Thomas":               "UST",
+    "St. Thomas (MN)":          "UST",
+    "St. Thomas (Minn.)":       "UST",
+    "University of St. Thomas": "UST",
+    "Oral Roberts":             "ORU",
+
+    # ── Other Summit League / Common Opponents ────────────────────────────────
+    "UMass":                    "UM",
+    "Massachusetts":            "UM",
+    "Delaware":                 "UD",
+    "Northern Colorado":        "UNC",
+
+    # ── Pioneer Football League (PFL) ─────────────────────────────────────────
+    "Dayton":                   "DAY",
+    "Butler":                   "BUT",
+    "Marist":                   "MARI",
+    "Presbyterian":             "PC",
+    "Valparaiso":               "VALPO",
+    "San Diego":                "SAND",
+    "Drake":                    "DRA",
+    "Davidson":                 "DC",
+    "Morehead State":           "MOSU",
+    "Stetson":                  "STET",
+
+    # ── NCHC Men's Ice Hockey ─────────────────────────────────────────────────
+    "Arizona State":            "ASU",
+    "Colorado College":         "CC",
+    "Denver":                   "DU",
+    "Miami":                    "MIA",
+    "Miami (OH)":               "MIA",
+    "Minnesota Duluth":         "UMD",
+    "St. Cloud State":          "SCSU",
+    "Western Michigan":         "WMU",
+}
+
 # ── Target Sports Configuration ────────────────────────────────────────────────
 SPORTS_CONFIG = [
     {
         "id": "wvball",
         "name": "Summit League Women's Volleyball",
         "url": "https://thesummitleague.org/standings.aspx?path=wvball",
-        "include_cpts": False,
+        "point_col": None,
         "skip_pods": False,
     },
     {
         "id": "msoc",
         "name": "Summit League Men's Soccer",
         "url": "https://thesummitleague.org/standings.aspx?path=msoc",
-        "include_cpts": True,
+        "point_col": "cpts",
         "skip_pods": False,
     },
     {
         "id": "wsoc",
         "name": "Summit League Women's Soccer",
         "url": "https://thesummitleague.org/standings.aspx?path=wsoc",
-        "include_cpts": True,
-        "skip_pods": True,   # ← skip the Pods table, use the full 8-team table
+        "point_col": "cpts",
+        "skip_pods": True,
     },
     {
         "id": "pfl",
         "name": "Pioneer Football League",
         "url": "https://pioneer-football.org/standings.aspx?standings=19",
-        "include_cpts": False,
+        "point_col": None,
         "skip_pods": False,
     },
     {
         "id": "mbball",
         "name": "Summit League Men's Basketball",
         "url": "https://thesummitleague.org/standings.aspx?path=mbball",
-        "include_cpts": False,
+        "point_col": None,
         "skip_pods": False,
     },
     {
         "id": "wbball",
         "name": "Summit League Women's Basketball",
         "url": "https://thesummitleague.org/standings.aspx?path=wbball",
-        "include_cpts": False,
+        "point_col": None,
         "skip_pods": False,
     },
     {
         "id": "mhockey",
         "name": "NCHC Men's Ice Hockey",
         "url": "https://nchchockey.com/standings.aspx?path=mhockey",
-        "include_cpts": False,
+        "point_col": "pts",
         "skip_pods": False,
     },
     {
         "id": "summit_195",
         "name": "Summit League Baseball",
         "url": "https://thesummitleague.org/standings.aspx?standings=195",
-        "include_cpts": False,
+        "point_col": None,
         "skip_pods": False,
     },
     {
         "id": "summit_193",
         "name": "Summit League Softball",
         "url": "https://thesummitleague.org/standings.aspx?standings=193",
-        "include_cpts": False,
+        "point_col": None,
         "skip_pods": False,
     },
 ]
@@ -99,6 +147,31 @@ SPORTS_CONFIG = [
 
 def clean(text):
     return re.sub(r"\s+", " ", text or "").strip()
+
+def get_team_acronym(team_name):
+    """Translate raw team name into standard acronym."""
+    cleaned = clean(team_name)
+
+    # Exact match
+    if cleaned in TEAM_ACRONYMS:
+        return TEAM_ACRONYMS[cleaned]
+
+    # Case-insensitive exact match
+    cleaned_lower = cleaned.lower()
+    for full_name, acronym in TEAM_ACRONYMS.items():
+        if full_name.lower() == cleaned_lower:
+            return acronym
+
+    # Partial match — full_name is contained within the scraped team string
+    for full_name, acronym in TEAM_ACRONYMS.items():
+        if full_name.lower() in cleaned_lower:
+            return acronym
+
+    # Fallback: initials of capitalised words
+    words = [w for w in re.split(r"[\s\-\.]+", cleaned) if w and w[0].isupper()]
+    if words:
+        return "".join(w[0] for w in words).upper()
+    return cleaned[:4].upper()
 
 def header_cells(table):
     row = table.select_one("thead tr:last-of-type") or table.find("tr")
@@ -113,56 +186,39 @@ def team_text(cell):
     return clean((link or cell).get_text())
 
 def is_pods_table(table):
-    """
-    Returns True if this table looks like a Pods/group table rather than
-    the full standings table. Heuristics:
-      - Fewer than 6 team rows in tbody
-      - Header contains "pod" or "group"
-      - Table has a caption or preceding heading mentioning "pod"
-    """
+    """Returns True if this table is a Pods/group sub-table rather than full standings."""
     hdrs = [h.lower() for h in header_cells(table)]
     if any("pod" in h or "group" in h for h in hdrs):
         return True
-
-    # Check for a preceding sibling heading that mentions "pod"
     prev = table.find_previous(["h2", "h3", "h4", "caption", "th"])
     if prev and "pod" in prev.get_text().lower():
         return True
-
-    # If the table has fewer than 6 data rows it's likely a pod sub-table
-    rows = body_rows(table)
-    if len(rows) < 6:
+    if len(body_rows(table)) < 6:
         return True
-
     return False
 
 
-# ── Generic Sidearm Standings Table Parser ────────────────────────────────────
+# ── Sidearm Standings Table Parser ────────────────────────────────────────────
 
 def parse_standings_table(html, sport_meta):
     soup = BeautifulSoup(html, "html.parser")
-    include_cpts = sport_meta.get("include_cpts", False)
-    skip_pods    = sport_meta.get("skip_pods", False)
+    point_col_type = sport_meta.get("point_col")
+    skip_pods      = sport_meta.get("skip_pods", False)
 
-    # ── Find the right table ──────────────────────────────────────────────────
-    candidate_tables = []
-    for table in soup.find_all("table"):
-        hdrs = header_cells(table)
-        hdrs_lower = [h.lower() for h in hdrs]
-        if any("team" in h or "school" in h or "member" in h for h in hdrs_lower):
-            candidate_tables.append(table)
+    # Find candidate tables that have a Team/School column
+    candidate_tables = [
+        t for t in soup.find_all("table")
+        if any(
+            "team" in h.lower() or "school" in h.lower() or "member" in h.lower()
+            for h in header_cells(t)
+        )
+    ]
 
     if not candidate_tables:
         raise ValueError(f"No standings table found for {sport_meta['name']}")
 
-    target = None
     if skip_pods:
-        # For WSOC: skip any pods/group tables, pick the first full 8-team table
-        for table in candidate_tables:
-            if not is_pods_table(table):
-                target = table
-                break
-        # Fallback: just take the largest table by row count
+        target = next((t for t in candidate_tables if not is_pods_table(t)), None)
         if target is None:
             target = max(candidate_tables, key=lambda t: len(body_rows(t)))
     else:
@@ -171,12 +227,10 @@ def parse_standings_table(html, sport_meta):
     if target is None:
         raise ValueError(f"Could not identify standings table for {sport_meta['name']}")
 
-    # ── Map column indices ────────────────────────────────────────────────────
     headers    = header_cells(target)
     hdrs_lower = [h.lower() for h in headers]
 
     def idx(*candidates):
-        """Return index of first header that contains any candidate string."""
         for c in candidates:
             for i, h in enumerate(hdrs_lower):
                 if c in h:
@@ -184,7 +238,6 @@ def parse_standings_table(html, sport_meta):
         return None
 
     def exact_idx(*candidates):
-        """Return index of first header that exactly matches a candidate string."""
         for c in candidates:
             for i, h in enumerate(hdrs_lower):
                 if h == c:
@@ -193,28 +246,28 @@ def parse_standings_table(html, sport_meta):
 
     team_idx = idx("team", "school", "member", "institution", "name")
 
-    # Conference record — prefer combined column, fall back to split W / L
+    # Conference record
     conf_combined = exact_idx("conf", "conference", "league")
     if conf_combined is None:
         conf_combined = idx("conf record", "conference record")
     conf_w_idx = idx("conf w", "cw", "conference w") if conf_combined is None else None
     conf_l_idx = idx("conf l", "cl", "conference l") if conf_combined is None else None
 
-    # Overall record — prefer combined, fall back to split
+    # Overall record
     ovr_combined = exact_idx("overall", "ovr", "total")
     if ovr_combined is None:
         ovr_combined = idx("overall record", "ovr record", "total record")
     ovr_w_idx = idx("overall w", "ow", "ovr w") if ovr_combined is None else None
     ovr_l_idx = idx("overall l", "ol", "ovr l") if ovr_combined is None else None
 
-    # CPTS — conference points (soccer only)
-    cpts_idx = None
-    if include_cpts:
-        cpts_idx = exact_idx("cpts", "pts", "points", "conf pts", "conf. pts")
-        if cpts_idx is None:
-            cpts_idx = idx("cpts", "conf pts", "conf. pts")
+    # Points column
+    pts_idx = None
+    if point_col_type == "cpts":
+        pts_idx = exact_idx("cpts", "conf pts", "pts", "points") or idx("cpts", "conf pts")
+    elif point_col_type == "pts":
+        pts_idx = exact_idx("pts", "points", "total pts", "tp") or idx("pts", "point")
 
-    # ── Parse rows ────────────────────────────────────────────────────────────
+    # Parse rows
     rows = []
     for tr in body_rows(target):
         cells = tr.find_all(["td", "th"])
@@ -227,6 +280,8 @@ def parse_standings_table(html, sport_meta):
         team = team_text(cells[team_idx]) if team_idx is not None else ""
         if not team or team.lower() in ("team", "school", "member", "institution"):
             continue
+
+        acronym = get_team_acronym(team)
 
         # Conference record
         if conf_combined is not None:
@@ -245,15 +300,17 @@ def parse_standings_table(html, sport_meta):
             ovr = "—"
 
         row_data = {
-            "rank": len(rows) + 1,
-            "team": team,
-            "conf": conf,
-            "ovr":  ovr,
+            "rank":    len(rows) + 1,
+            "team":    team,
+            "acronym": acronym,
+            "conf":    conf,
+            "ovr":     ovr,
         }
 
-        # CPTS (soccer only)
-        if include_cpts and cpts_idx is not None:
-            row_data["cpts"] = cell_text(cpts_idx) or "0"
+        if point_col_type == "cpts" and pts_idx is not None:
+            row_data["cpts"] = cell_text(pts_idx) or "0"
+        elif point_col_type == "pts" and pts_idx is not None:
+            row_data["pts"] = cell_text(pts_idx) or "0"
 
         rows.append(row_data)
 
@@ -268,13 +325,9 @@ def parse_standings_table(html, sport_meta):
     }
 
 
-# ── Render Pages using a Single Playwright Browser Session ────────────────────
+# ── Playwright Fetch ──────────────────────────────────────────────────────────
 
 def fetch_all_rendered(sports):
-    """
-    Launches one Chromium browser and fetches/parses each page sequentially.
-    Aborts images, fonts, and media for faster loading in GitHub Actions.
-    """
     from playwright.sync_api import sync_playwright
 
     scraped_data = {}
@@ -283,7 +336,6 @@ def fetch_all_rendered(sports):
         context = browser.new_context(user_agent=UA)
         page    = context.new_page()
 
-        # Speed up: skip images, fonts, media
         page.route(
             "**/*",
             lambda route: route.abort()
@@ -304,8 +356,8 @@ def fetch_all_rendered(sports):
                 html = page.content()
                 data = parse_standings_table(html, sport)
                 scraped_data[sport_id] = {"status": "ok", **data}
-                cpts_note = " (with CPTS)" if sport.get("include_cpts") else ""
-                print(f"  ✓ Parsed {len(data['rows'])} rows{cpts_note}.")
+                pts_note = f" (with {sport['point_col'].upper()})" if sport.get("point_col") else ""
+                print(f"  ✓ Parsed {len(data['rows'])} rows{pts_note}.")
             except Exception as exc:
                 print(f"  ✗ Error [{sport_id}]: {exc}", file=sys.stderr)
                 scraped_data[sport_id] = {
@@ -319,7 +371,7 @@ def fetch_all_rendered(sports):
     return scraped_data
 
 
-# ── Main / Stale-Safe Persistence ─────────────────────────────────────────────
+# ── Main ──────────────────────────────────────────────────────────────────────
 
 def now_iso():
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
@@ -331,7 +383,6 @@ def main():
 
     out_path = Path(args.out)
 
-    # Load previous data for stale fallback
     old_sports = {}
     if out_path.exists():
         try:
@@ -344,9 +395,9 @@ def main():
     final_sports      = {}
 
     for sport in SPORTS_CONFIG:
-        s_id  = sport["id"]
-        res   = new_scraped.get(s_id)
-        old   = old_sports.get(s_id)
+        s_id = sport["id"]
+        res  = new_scraped.get(s_id)
+        old  = old_sports.get(s_id)
 
         if res and res.get("status") == "ok":
             res["updated_at"] = current_timestamp
@@ -377,7 +428,7 @@ def main():
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    print(f"\n✓ Wrote {len(final_sports)} sports to {out_path}")
+    print(f"\n✓ Successfully wrote {len(final_sports)} sports to {out_path}")
 
 
 if __name__ == "__main__":
