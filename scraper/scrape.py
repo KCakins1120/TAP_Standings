@@ -1,33 +1,80 @@
 #!/usr/bin/env python3
 """
-Fetch the Summit League Women's Volleyball standings and write them to
-docs/data.json. Modeled directly after womens-hockey-board/scraper/scrape.py.
+Fetch standings from multiple Summit League, PFL, and NCHC sports pages,
+extracting Team, Conference record (W-L), and Overall record (W-L) for each.
+Writes structured output to docs/data.json.
 
-Safe by design: if the scrape fails, the last good data stays in the file
-and is marked "stale" so the site never goes blank.
+Safe by design: if any individual source fails, the last good data for that sport
+stays in the file marked "stale", so the website never goes blank.
 
 Usage:
     python scraper/scrape.py
     python scraper/scrape.py --out docs/data.json
-    python scraper/scrape.py --standings-html saved.html --out /tmp/data.json
 """
 
 import argparse
 import datetime as dt
 import json
+import os
 import re
 import sys
 from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-STANDINGS_URL = (
-    "https://thesummitleague.org/standings.aspx?path=wvball"
-)
-UA = "Mozilla/5.0 (compatible; TAPStandings/1.0; personal project)"
+UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
+# ── Target Sports Configuration ────────────────────────────────────────────────
+SPORTS_CONFIG = [
+    {
+        "id": "wvball",
+        "name": "Summit League Women's Volleyball",
+        "url": "https://thesummitleague.org/standings.aspx?path=wvball",
+    },
+    {
+        "id": "msoc",
+        "name": "Summit League Men's Soccer",
+        "url": "https://thesummitleague.org/standings.aspx?path=msoc",
+    },
+    {
+        "id": "wsoc",
+        "name": "Summit League Women's Soccer",
+        "url": "https://thesummitleague.org/standings.aspx?path=wsoc",
+    },
+    {
+        "id": "pfl",
+        "name": "Pioneer Football League",
+        "url": "https://pioneer-football.org/standings.aspx?standings=19",
+    },
+    {
+        "id": "mbball",
+        "name": "Summit League Men's Basketball",
+        "url": "https://thesummitleague.org/standings.aspx?path=mbball",
+    },
+    {
+        "id": "wbball",
+        "name": "Summit League Women's Basketball",
+        "url": "https://thesummitleague.org/standings.aspx?path=wbball",
+    },
+    {
+        "id": "mhockey",
+        "name": "NCHC Men's Ice Hockey",
+        "url": "https://nchchockey.com/standings.aspx?path=mhockey",
+    },
+    {
+        "id": "summit_195",
+        "name": "Summit League Baseball / Standings 195",
+        "url": "https://thesummitleague.org/standings.aspx?standings=195",
+    },
+    {
+        "id": "summit_193",
+        "name": "Summit League Softball / Standings 193",
+        "url": "https://thesummitleague.org/standings.aspx?standings=193",
+    },
+]
 
 
-# ── helpers ───────────────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def clean(text):
     return re.sub(r"\s+", " ", text or "").strip()
@@ -45,56 +92,43 @@ def team_text(cell):
     return clean((link or cell).get_text())
 
 
-# ── parser ────────────────────────────────────────────────────────────────────
+# ── Generic Sidearm Standings Table Parser ────────────────────────────────────
 
-def parse_standings(html):
+def parse_standings_table(html, sport_meta):
     soup = BeautifulSoup(html, "html.parser")
 
-    # Find the standings table — look for one that has a "Team" column
     target = None
     for table in soup.find_all("table"):
         hdrs = header_cells(table)
         hdrs_lower = [h.lower() for h in hdrs]
-        if any("team" in h or "school" in h for h in hdrs_lower):
+        if any("team" in h or "school" in h or "member" in h for h in hdrs_lower):
             target = table
             break
 
     if target is None:
-        raise ValueError("Standings table not found (page layout may have changed).")
+        raise ValueError(f"Standings table not found for {sport_meta['name']}")
 
     headers = header_cells(target)
     hdrs_lower = [h.lower() for h in headers]
 
     def idx(*candidates):
-        """Return the index of the first matching header, or None."""
         for c in candidates:
             for i, h in enumerate(hdrs_lower):
-                if c in h:
+                if c == h or c in h:
                     return i
         return None
 
-    team_idx = idx("team", "school", "name")
+    team_idx = idx("team", "school", "member", "institution", "name")
 
-    # Conference record — prefer a combined "Conf" column, fall back to split W / L
-    conf_combined = idx("conf record", "conference record")
-    if conf_combined is None:
-        # Look for a column that is just "conf" or "conference" (not "conf w" etc.)
-        for i, h in enumerate(hdrs_lower):
-            if h in ("conf", "conference"):
-                conf_combined = i
-                break
-    conf_w_idx = idx("conf w", "cw", "conference w") if conf_combined is None else None
-    conf_l_idx = idx("conf l", "cl", "conference l") if conf_combined is None else None
+    # Conference record detection (combined vs split)
+    conf_combined = idx("conf record", "conference record", "league", "conf")
+    conf_w_idx = idx("conf w", "cw", "conference w", "w-conf") if conf_combined is None else None
+    conf_l_idx = idx("conf l", "cl", "conference l", "l-conf") if conf_combined is None else None
 
-    # Overall record — prefer combined, fall back to split
-    ovr_combined = idx("overall record", "ovr record", "total record")
-    if ovr_combined is None:
-        for i, h in enumerate(hdrs_lower):
-            if h in ("overall", "ovr", "total"):
-                ovr_combined = i
-                break
-    ovr_w_idx = idx("overall w", "ow", "ovr w") if ovr_combined is None else None
-    ovr_l_idx = idx("overall l", "ol", "ovr l") if ovr_combined is None else None
+    # Overall record detection (combined vs split)
+    ovr_combined = idx("overall record", "ovr record", "total record", "overall", "ovr")
+    ovr_w_idx = idx("overall w", "ow", "ovr w", "w-overall", "w-ovr") if ovr_combined is None else None
+    ovr_l_idx = idx("overall l", "ol", "ovr l", "l-overall", "l-ovr") if ovr_combined is None else None
 
     rows = []
     for tr in body_rows(target):
@@ -105,118 +139,146 @@ def parse_standings(html):
                 return ""
             return clean(cells[i].get_text())
 
-        team = team_text(cells[team_idx]) if team_idx is not None else f"Team {len(rows)+1}"
-        if not team:
+        team = team_text(cells[team_idx]) if team_idx is not None else ""
+        if not team or team.lower() in ("team", "school", "member"):
             continue
 
-        # Build "W-L" strings
+        # Extract Conf record
         if conf_combined is not None:
-            conf = cell_text(conf_combined).replace("–", "-") or "?-?"
+            conf = cell_text(conf_combined).replace("–", "-") or "0-0"
         elif conf_w_idx is not None and conf_l_idx is not None:
             conf = f"{cell_text(conf_w_idx)}-{cell_text(conf_l_idx)}"
         else:
-            conf = "?-?"
+            conf = "—"
 
+        # Extract Overall record
         if ovr_combined is not None:
-            ovr = cell_text(ovr_combined).replace("–", "-") or "?-?"
+            ovr = cell_text(ovr_combined).replace("–", "-") or "0-0"
         elif ovr_w_idx is not None and ovr_l_idx is not None:
             ovr = f"{cell_text(ovr_w_idx)}-{cell_text(ovr_l_idx)}"
         else:
-            ovr = "?-?"
+            ovr = "—"
 
         rows.append({
             "rank": len(rows) + 1,
             "team": team,
-            "conf": conf,   # e.g. "8-0"
-            "ovr":  ovr,    # e.g. "14-2"
+            "conf": conf,
+            "ovr": ovr,
         })
 
-    if len(rows) < 4:
-        raise ValueError(f"Only found {len(rows)} team(s); expected at least 4.")
+    if not rows:
+        raise ValueError(f"No team rows parsed for {sport_meta['name']}")
 
     return {
-        "source": STANDINGS_URL,
-        "name":   "Summit League Women's Volleyball Standings",
-        "rows":   rows,
+        "id": sport_meta["id"],
+        "name": sport_meta["name"],
+        "source": sport_meta["url"],
+        "rows": rows,
     }
 
 
-# ── fetching ──────────────────────────────────────────────────────────────────
+# ── Render Page using Playwright Browser Session ──────────────────────────────
 
-def fetch_rendered(url):
-    """Summit League uses JavaScript to render the table, so use Playwright."""
+def fetch_all_rendered(sports):
+    """
+    Launches a single Chromium browser session and fetches/parses each page sequentially
+    to save overhead and run fast in GitHub Actions.
+    """
     from playwright.sync_api import sync_playwright
+
+    scraped_data = {}
     with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page(user_agent=UA)
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(user_agent=UA)
+        page = context.new_page()
+
+        # Abort images, fonts, media for faster page loading
         page.route(
             "**/*",
             lambda route: route.abort()
-            if route.request.resource_type in ("image", "media", "font")
+            if route.request.resource_type in ("image", "media", "font", "stylesheet")
             else route.continue_(),
         )
-        page.goto(url, wait_until="domcontentloaded", timeout=45000)
-        page.wait_for_selector("table tbody tr", timeout=45000)
-        html = page.content()
+
+        for sport in sports:
+            sport_id = sport["id"]
+            url = sport["url"]
+            print(f"Fetching [{sport['name']}] -> {url}...")
+            try:
+                page.goto(url, wait_until="domcontentloaded", timeout=45000)
+                try:
+                    page.wait_for_selector("table", timeout=15000)
+                except Exception:
+                    pass
+                html = page.content()
+                data = parse_standings_table(html, sport)
+                scraped_data[sport_id] = {"status": "ok", **data}
+                print(f"  ✓ Successfully parsed {len(data['rows'])} rows.")
+            except Exception as exc:
+                print(f"  ✗ Error parsing {sport_id}: {exc}", file=sys.stderr)
+                scraped_data[sport_id] = {"status": "error", "error": str(exc)[:300], "rows": []}
+
         browser.close()
-    return html
+
+    return scraped_data
 
 
-# ── main ──────────────────────────────────────────────────────────────────────
+# ── Main / Stale-Safe Persistence ─────────────────────────────────────────────
 
 def now_iso():
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
 
-def core(section):
-    return {k: v for k, v in (section or {}).items() if k not in ("updated_at", "status", "error")}
-
-def refresh(name, old, build):
-    try:
-        data = build()
-    except Exception as exc:
-        print(f"[{name}] FAILED: {exc}", file=sys.stderr)
-        if old:
-            return {**old, "status": "stale", "error": str(exc)[:300]}, False
-        return {"status": "error", "error": str(exc)[:300], "rows": []}, False
-
-    if old and old.get("status") == "ok" and core(old) == core(data):
-        print(f"[{name}] no change")
-        return old, True
-
-    print(f"[{name}] updated ({len(data['rows'])} rows)")
-    return {**data, "status": "ok", "updated_at": now_iso()}, True
-
-
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default="docs/data.json")
-    ap.add_argument("--standings-html", help="parse this saved file instead of fetching live")
+    ap.add_argument("--out", default="docs/data.json", help="Path to output data.json")
     args = ap.parse_args()
 
-    out = Path(args.out)
-    old = json.loads(out.read_text()) if out.exists() else {}
+    out_path = Path(args.out)
+    old_file_data = {}
+    if out_path.exists():
+        try:
+            old_file_data = json.loads(out_path.read_text(encoding="utf-8"))
+        except Exception:
+            old_file_data = {}
 
-    def build_standings():
-        html = (
-            Path(args.standings_html).read_text()
-            if args.standings_html
-            else fetch_rendered(STANDINGS_URL)
-        )
-        return parse_standings(html)
+    old_sports = old_file_data.get("sports", {})
+    new_scraped = fetch_all_rendered(SPORTS_CONFIG)
 
-    standings, ok = refresh("standings", old.get("standings"), build_standings)
-    new = {"standings": standings}
+    current_timestamp = now_iso()
+    final_sports = {}
 
-    if json.dumps(new, sort_keys=True) != json.dumps({"standings": old.get("standings")}, sort_keys=True):
-        new["generated_at"] = now_iso()
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(json.dumps(new, indent=2, ensure_ascii=False) + "\n")
-        print(f"wrote {out}")
-    else:
-        print("data.json unchanged")
+    for sport in SPORTS_CONFIG:
+        s_id = sport["id"]
+        res = new_scraped.get(s_id)
+        old_res = old_sports.get(s_id)
 
-    if not standings.get("rows"):
-        sys.exit(1)
+        if res and res.get("status") == "ok":
+            res["updated_at"] = current_timestamp
+            final_sports[s_id] = res
+        elif old_res and old_res.get("rows"):
+            print(f"[{s_id}] Using previous data marked as stale.")
+            final_sports[s_id] = {
+                **old_res,
+                "status": "stale",
+                "error": res.get("error") if res else "Fetch failed",
+            }
+        else:
+            final_sports[s_id] = res or {
+                "id": s_id,
+                "name": sport["name"],
+                "source": sport["url"],
+                "status": "error",
+                "rows": [],
+            }
+
+    output_payload = {
+        "generated_at": current_timestamp,
+        "sports": final_sports,
+    }
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(output_payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"\n✓ Successfully wrote all {len(final_sports)} sports to {out_path}")
 
 
 if __name__ == "__main__":
