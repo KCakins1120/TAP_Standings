@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-30T14:43:32+00:00",
+  "generated_at": "2026-10-31T14:24:17+00:00",
   "sports": {
     "wvball": {
       "status": "ok",
@@ -37,17 +37,17 @@
         },
         {
           "rank": 5,
-          "team": "Kansas City",
-          "acronym": "UMKC",
-          "conf": "4-4",
-          "ovr": "10-10"
+          "team": "North Dakota State",
+          "acronym": "NDSU",
+          "conf": "5-5",
+          "ovr": "13-7"
         },
         {
           "rank": 6,
-          "team": "North Dakota State",
-          "acronym": "NDSU",
+          "team": "Kansas City",
+          "acronym": "UMKC",
           "conf": "4-5",
-          "ovr": "12-7"
+          "ovr": "10-11"
         },
         {
           "rank": 7,
@@ -64,7 +64,7 @@
           "ovr": "6-14"
         }
       ],
-      "updated_at": "2026-10-30T14:43:32+00:00"
+      "updated_at": "2026-10-31T14:24:17+00:00"
     },
     "msoc": {
       "status": "ok",
@@ -121,7 +121,7 @@
           "cpts": "2"
         }
       ],
-      "updated_at": "2026-10-30T14:43:32+00:00"
+      "updated_at": "2026-10-31T14:24:17+00:00"
     },
     "wsoc": {
       "status": "ok",
@@ -210,7 +210,7 @@
           "cpts": "6"
         }
       ],
-      "updated_at": "2026-10-30T14:43:32+00:00"
+      "updated_at": "2026-10-31T14:24:17+00:00"
     },
     "pfl": {
       "status": "ok",
@@ -296,7 +296,7 @@
           "ovr": "1-7"
         }
       ],
-      "updated_at": "2026-10-30T14:43:32+00:00"
+      "updated_at": "2026-10-31T14:24:17+00:00"
     },
     "mbball": {
       "status": "ok",
@@ -361,7 +361,7 @@
           "ovr": "0-0"
         }
       ],
-      "updated_at": "2026-10-30T14:43:32+00:00"
+      "updated_at": "2026-10-31T14:24:17+00:00"
     },
     "wbball": {
       "status": "ok",
@@ -426,7 +426,7 @@
           "ovr": "0-0"
         }
       ],
-      "updated_at": "2026-10-30T14:43:32+00:00"
+      "updated_at": "2026-10-31T14:24:17+00:00"
     },
     "mhockey": {
       "status": "ok",
@@ -439,43 +439,35 @@
           "team": "Arizona State",
           "acronym": "ASU",
           "conf": "—",
-          "ovr": "4-2-0",
-          "pts": "0"
+          "ovr": "5-2-0",
+          "pts": "3"
         },
         {
           "rank": 2,
-          "team": "Colorado College",
-          "acronym": "CC",
-          "conf": "—",
-          "ovr": "5-1-0",
-          "pts": "0"
-        },
-        {
-          "rank": 3,
           "team": "Denver",
           "acronym": "DU",
           "conf": "—",
-          "ovr": "3-2-1",
-          "pts": "0"
+          "ovr": "4-2-1",
+          "pts": "3"
         },
         {
-          "rank": 4,
+          "rank": 3,
           "team": "Miami",
           "acronym": "MIA",
           "conf": "—",
-          "ovr": "5-1-0",
-          "pts": "0"
+          "ovr": "6-1-0",
+          "pts": "3"
         },
         {
-          "rank": 5,
+          "rank": 4,
           "team": "Minnesota Duluth",
           "acronym": "UMD",
           "conf": "—",
-          "ovr": "5-1-2",
-          "pts": "0"
+          "ovr": "6-1-2",
+          "pts": "3"
         },
         {
-          "rank": 6,
+          "rank": 5,
           "team": "North Dakota",
           "acronym": "UND",
           "conf": "—",
@@ -483,39 +475,47 @@
           "pts": "0"
         },
         {
-          "rank": 7,
-          "team": "Omaha",
-          "acronym": "OMA",
+          "rank": 6,
+          "team": "Western Michigan",
+          "acronym": "WMU",
           "conf": "—",
-          "ovr": "2-2-0",
+          "ovr": "6-1-0",
+          "pts": "0"
+        },
+        {
+          "rank": 7,
+          "team": "Colorado College",
+          "acronym": "CC",
+          "conf": "—",
+          "ovr": "5-2-0",
           "pts": "0"
         },
         {
           "rank": 8,
-          "team": "St. Cloud State",
-          "acronym": "SCSU",
+          "team": "Omaha",
+          "acronym": "OMA",
           "conf": "—",
           "ovr": "2-3-0",
           "pts": "0"
         },
         {
           "rank": 9,
-          "team": "St. Thomas",
-          "acronym": "UST",
+          "team": "St. Cloud State",
+          "acronym": "SCSU",
           "conf": "—",
-          "ovr": "1-3-0",
+          "ovr": "2-4-0",
           "pts": "0"
         },
         {
           "rank": 10,
-          "team": "Western Michigan",
-          "acronym": "WMU",
+          "team": "St. Thomas",
+          "acronym": "UST",
           "conf": "—",
-          "ovr": "5-1-0",
+          "ovr": "1-4-0",
           "pts": "0"
         }
       ],
-      "updated_at": "2026-10-30T14:43:32+00:00"
+      "updated_at": "2026-10-31T14:24:17+00:00"
     },
     "summit_195": {
       "status": "error",
