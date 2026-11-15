@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-14T14:31:28+00:00",
+  "generated_at": "2026-11-15T14:31:40+00:00",
   "sports": {
     "wvball": {
       "status": "ok",
@@ -11,36 +11,36 @@
           "rank": 1,
           "team": "South Dakota",
           "acronym": "USD",
-          "conf": "12-1",
-          "ovr": "19-5"
+          "conf": "13-1",
+          "ovr": "20-5"
         },
         {
           "rank": 2,
           "team": "South Dakota State",
           "acronym": "SDSU",
-          "conf": "10-3",
-          "ovr": "14-10"
+          "conf": "11-3",
+          "ovr": "15-10"
         },
         {
           "rank": 3,
           "team": "St. Thomas",
           "acronym": "UST",
-          "conf": "8-4",
-          "ovr": "10-11"
+          "conf": "9-4",
+          "ovr": "11-11"
         },
         {
           "rank": 4,
-          "team": "North Dakota State",
-          "acronym": "NDSU",
-          "conf": "7-6",
-          "ovr": "15-8"
+          "team": "Omaha",
+          "acronym": "OMA",
+          "conf": "7-7",
+          "ovr": "13-11"
         },
         {
           "rank": 5,
-          "team": "Omaha",
-          "acronym": "OMA",
-          "conf": "6-7",
-          "ovr": "12-11"
+          "team": "North Dakota State",
+          "acronym": "NDSU",
+          "conf": "7-7",
+          "ovr": "15-9"
         },
         {
           "rank": 6,
@@ -53,18 +53,18 @@
           "rank": 7,
           "team": "North Dakota",
           "acronym": "UND",
-          "conf": "2-11",
-          "ovr": "8-16"
+          "conf": "2-12",
+          "ovr": "8-17"
         },
         {
           "rank": 8,
           "team": "Oral Roberts",
           "acronym": "ORU",
-          "conf": "0-12",
-          "ovr": "6-17"
+          "conf": "0-14",
+          "ovr": "6-19"
         }
       ],
-      "updated_at": "2026-11-14T14:31:28+00:00"
+      "updated_at": "2026-11-15T14:31:40+00:00"
     },
     "msoc": {
       "status": "ok",
@@ -85,7 +85,7 @@
           "team": "Omaha",
           "acronym": "OMA",
           "conf": "3-1-1",
-          "ovr": "10-4-3",
+          "ovr": "11-4-3",
           "cpts": "10"
         },
         {
@@ -109,7 +109,7 @@
           "team": "St. Thomas",
           "acronym": "UST",
           "conf": "1-3-1",
-          "ovr": "5-8-5",
+          "ovr": "5-9-5",
           "cpts": "4"
         },
         {
@@ -121,7 +121,7 @@
           "cpts": "3"
         }
       ],
-      "updated_at": "2026-11-14T14:31:28+00:00"
+      "updated_at": "2026-11-15T14:31:40+00:00"
     },
     "wsoc": {
       "status": "ok",
@@ -210,7 +210,7 @@
           "cpts": "7"
         }
       ],
-      "updated_at": "2026-11-14T14:31:28+00:00"
+      "updated_at": "2026-11-15T14:31:40+00:00"
     },
     "pfl": {
       "status": "ok",
@@ -222,81 +222,81 @@
           "rank": 1,
           "team": "Dayton",
           "acronym": "DAY",
-          "conf": "5-1",
-          "ovr": "8-1"
+          "conf": "6-1",
+          "ovr": "9-1"
         },
         {
           "rank": 2,
           "team": "Butler",
           "acronym": "BUT",
-          "conf": "5-1",
-          "ovr": "8-2"
+          "conf": "6-1",
+          "ovr": "9-2"
         },
         {
           "rank": 3,
           "team": "St. Thomas",
           "acronym": "UST",
-          "conf": "4-2",
-          "ovr": "7-3"
+          "conf": "5-2",
+          "ovr": "8-3"
         },
         {
           "rank": 4,
-          "team": "Marist",
-          "acronym": "MARI",
-          "conf": "4-2",
-          "ovr": "5-5"
-        },
-        {
-          "rank": 5,
           "team": "San Diego",
           "acronym": "SAND",
           "conf": "4-3",
           "ovr": "5-5"
         },
         {
+          "rank": 5,
+          "team": "Valparaiso",
+          "acronym": "VALPO",
+          "conf": "4-3",
+          "ovr": "5-5"
+        },
+        {
           "rank": 6,
-          "team": "Presbyterian",
-          "acronym": "PC",
-          "conf": "3-3",
-          "ovr": "4-5"
+          "team": "Marist",
+          "acronym": "MARI",
+          "conf": "4-3",
+          "ovr": "5-6"
         },
         {
           "rank": 7,
-          "team": "Valparaiso",
-          "acronym": "VALPO",
-          "conf": "3-3",
-          "ovr": "4-5"
+          "team": "Presbyterian",
+          "acronym": "PC",
+          "conf": "3-4",
+          "ovr": "4-6"
         },
         {
           "rank": 8,
           "team": "Drake",
           "acronym": "DRA",
-          "conf": "3-4",
-          "ovr": "3-7"
+          "conf": "3-5",
+          "ovr": "3-8"
         },
         {
           "rank": 9,
           "team": "Davidson",
           "acronym": "DC",
-          "conf": "2-4",
-          "ovr": "4-6"
+          "conf": "2-5",
+          "ovr": "4-7"
         },
         {
           "rank": 10,
           "team": "Morehead State",
           "acronym": "MOSU",
-          "conf": "1-5",
-          "ovr": "2-8"
+          "conf": "2-5",
+          "ovr": "3-8"
         },
         {
           "rank": 11,
           "team": "Stetson",
           "acronym": "STET",
-          "conf": "0-6",
-          "ovr": "1-9"
+          "conf": "0-7",
+          "ovr": "1-10"
         }
       ],
-      "updated_at": "2026-11-14T14:31:28+00:00"
+      "updated_at": "2026-11-15T14:31:40+00:00"
     },
     "mbball": {
       "status": "ok",
@@ -309,7 +309,7 @@
           "team": "South Dakota State",
           "acronym": "SDSU",
           "conf": "0-0",
-          "ovr": "3-0"
+          "ovr": "4-0"
         },
         {
           "rank": 2,
@@ -320,8 +320,8 @@
         },
         {
           "rank": 3,
-          "team": "St. Thomas",
-          "acronym": "UST",
+          "team": "Oral Roberts",
+          "acronym": "ORU",
           "conf": "0-0",
           "ovr": "2-2"
         },
@@ -341,17 +341,17 @@
         },
         {
           "rank": 6,
-          "team": "North Dakota",
-          "acronym": "UND",
+          "team": "St. Thomas",
+          "acronym": "UST",
           "conf": "0-0",
-          "ovr": "1-2"
+          "ovr": "2-3"
         },
         {
           "rank": 7,
-          "team": "Oral Roberts",
-          "acronym": "ORU",
+          "team": "North Dakota",
+          "acronym": "UND",
           "conf": "0-0",
-          "ovr": "1-2"
+          "ovr": "1-3"
         },
         {
           "rank": 8,
@@ -361,7 +361,7 @@
           "ovr": "1-4"
         }
       ],
-      "updated_at": "2026-11-14T14:31:28+00:00"
+      "updated_at": "2026-11-15T14:31:40+00:00"
     },
     "wbball": {
       "status": "ok",
@@ -385,15 +385,15 @@
         },
         {
           "rank": 3,
-          "team": "St. Thomas",
-          "acronym": "UST",
+          "team": "Omaha",
+          "acronym": "OMA",
           "conf": "0-0",
-          "ovr": "2-1"
+          "ovr": "2-2"
         },
         {
           "rank": 4,
-          "team": "Omaha",
-          "acronym": "OMA",
+          "team": "St. Thomas",
+          "acronym": "UST",
           "conf": "0-0",
           "ovr": "2-2"
         },
@@ -406,17 +406,17 @@
         },
         {
           "rank": 6,
-          "team": "North Dakota",
-          "acronym": "UND",
+          "team": "South Dakota State",
+          "acronym": "SDSU",
           "conf": "0-0",
           "ovr": "1-2"
         },
         {
           "rank": 7,
-          "team": "South Dakota State",
-          "acronym": "SDSU",
+          "team": "North Dakota",
+          "acronym": "UND",
           "conf": "0-0",
-          "ovr": "1-2"
+          "ovr": "1-3"
         },
         {
           "rank": 8,
@@ -426,7 +426,7 @@
           "ovr": "1-3"
         }
       ],
-      "updated_at": "2026-11-14T14:31:28+00:00"
+      "updated_at": "2026-11-15T14:31:40+00:00"
     },
     "mhockey": {
       "status": "ok",
@@ -436,51 +436,51 @@
       "rows": [
         {
           "rank": 1,
-          "team": "Denver",
-          "acronym": "DU",
-          "conf": "—",
-          "ovr": "8-2-1",
-          "pts": "11"
-        },
-        {
-          "rank": 2,
           "team": "Minnesota Duluth",
           "acronym": "UMD",
           "conf": "—",
-          "ovr": "8-3-2",
-          "pts": "9"
+          "ovr": "9-3-2",
+          "pts": "12"
+        },
+        {
+          "rank": 2,
+          "team": "Denver",
+          "acronym": "DU",
+          "conf": "—",
+          "ovr": "9-2-1",
+          "pts": "11"
         },
         {
           "rank": 3,
-          "team": "Omaha",
-          "acronym": "OMA",
-          "conf": "—",
-          "ovr": "4-4-1",
-          "pts": "8"
-        },
-        {
-          "rank": 4,
           "team": "North Dakota",
           "acronym": "UND",
           "conf": "—",
-          "ovr": "6-3-1",
-          "pts": "7"
+          "ovr": "7-3-1",
+          "pts": "10"
         },
         {
-          "rank": 5,
+          "rank": 4,
           "team": "Miami",
           "acronym": "MIA",
           "conf": "—",
-          "ovr": "7-4-0",
-          "pts": "6"
+          "ovr": "8-4-0",
+          "pts": "9"
+        },
+        {
+          "rank": 5,
+          "team": "Omaha",
+          "acronym": "OMA",
+          "conf": "—",
+          "ovr": "4-5-1",
+          "pts": "8"
         },
         {
           "rank": 6,
           "team": "Western Michigan",
           "acronym": "WMU",
           "conf": "—",
-          "ovr": "7-2-1",
-          "pts": "5"
+          "ovr": "8-2-1",
+          "pts": "7"
         },
         {
           "rank": 7,
@@ -492,30 +492,30 @@
         },
         {
           "rank": 8,
-          "team": "St. Cloud State",
-          "acronym": "SCSU",
+          "team": "Colorado College",
+          "acronym": "CC",
           "conf": "—",
-          "ovr": "3-6-1",
+          "ovr": "7-4-1",
           "pts": "4"
         },
         {
           "rank": 9,
-          "team": "Colorado College",
-          "acronym": "CC",
+          "team": "St. Cloud State",
+          "acronym": "SCSU",
           "conf": "—",
-          "ovr": "7-3-1",
-          "pts": "3"
+          "ovr": "3-7-1",
+          "pts": "4"
         },
         {
           "rank": 10,
           "team": "St. Thomas",
           "acronym": "UST",
           "conf": "—",
-          "ovr": "4-5-0",
+          "ovr": "4-6-0",
           "pts": "3"
         }
       ],
-      "updated_at": "2026-11-14T14:31:28+00:00"
+      "updated_at": "2026-11-15T14:31:40+00:00"
     },
     "summit_195": {
       "status": "error",
