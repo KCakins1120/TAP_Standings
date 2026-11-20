@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-19T14:43:29+00:00",
+  "generated_at": "2026-11-20T14:43:34+00:00",
   "sports": {
     "wvball": {
       "status": "ok",
@@ -64,7 +64,7 @@
           "ovr": "6-19"
         }
       ],
-      "updated_at": "2026-11-19T14:43:29+00:00"
+      "updated_at": "2026-11-20T14:43:34+00:00"
     },
     "msoc": {
       "status": "ok",
@@ -85,7 +85,7 @@
           "team": "Omaha",
           "acronym": "OMA",
           "conf": "3-1-1",
-          "ovr": "11-4-3",
+          "ovr": "12-4-3",
           "cpts": "10"
         },
         {
@@ -121,7 +121,7 @@
           "cpts": "3"
         }
       ],
-      "updated_at": "2026-11-19T14:43:29+00:00"
+      "updated_at": "2026-11-20T14:43:34+00:00"
     },
     "wsoc": {
       "status": "ok",
@@ -210,7 +210,7 @@
           "cpts": "7"
         }
       ],
-      "updated_at": "2026-11-19T14:43:29+00:00"
+      "updated_at": "2026-11-20T14:43:34+00:00"
     },
     "pfl": {
       "status": "ok",
@@ -296,7 +296,7 @@
           "ovr": "1-10"
         }
       ],
-      "updated_at": "2026-11-19T14:43:29+00:00"
+      "updated_at": "2026-11-20T14:43:34+00:00"
     },
     "mbball": {
       "status": "ok",
@@ -313,31 +313,31 @@
         },
         {
           "rank": 2,
+          "team": "St. Thomas",
+          "acronym": "UST",
+          "conf": "0-0",
+          "ovr": "4-3"
+        },
+        {
+          "rank": 3,
           "team": "Kansas City",
           "acronym": "UMKC",
           "conf": "0-0",
           "ovr": "3-3"
         },
         {
-          "rank": 3,
-          "team": "Omaha",
-          "acronym": "OMA",
-          "conf": "0-0",
-          "ovr": "3-3"
-        },
-        {
           "rank": 4,
-          "team": "St. Thomas",
-          "acronym": "UST",
+          "team": "North Dakota",
+          "acronym": "UND",
           "conf": "0-0",
           "ovr": "3-3"
         },
         {
           "rank": 5,
-          "team": "North Dakota",
-          "acronym": "UND",
+          "team": "Omaha",
+          "acronym": "OMA",
           "conf": "0-0",
-          "ovr": "2-3"
+          "ovr": "3-3"
         },
         {
           "rank": 6,
@@ -361,7 +361,7 @@
           "ovr": "2-5"
         }
       ],
-      "updated_at": "2026-11-19T14:43:29+00:00"
+      "updated_at": "2026-11-20T14:43:34+00:00"
     },
     "wbball": {
       "status": "ok",
@@ -392,41 +392,41 @@
         },
         {
           "rank": 4,
+          "team": "North Dakota State",
+          "acronym": "NDSU",
+          "conf": "0-0",
+          "ovr": "2-3"
+        },
+        {
+          "rank": 5,
           "team": "Omaha",
           "acronym": "OMA",
           "conf": "0-0",
           "ovr": "2-3"
         },
         {
-          "rank": 5,
+          "rank": 6,
           "team": "South Dakota State",
           "acronym": "SDSU",
           "conf": "0-0",
           "ovr": "2-3"
         },
         {
-          "rank": 6,
+          "rank": 7,
           "team": "Oral Roberts",
           "acronym": "ORU",
           "conf": "0-0",
           "ovr": "2-4"
         },
         {
-          "rank": 7,
+          "rank": 8,
           "team": "North Dakota",
           "acronym": "UND",
           "conf": "0-0",
           "ovr": "1-3"
-        },
-        {
-          "rank": 8,
-          "team": "North Dakota State",
-          "acronym": "NDSU",
-          "conf": "0-0",
-          "ovr": "1-3"
         }
       ],
-      "updated_at": "2026-11-19T14:43:29+00:00"
+      "updated_at": "2026-11-20T14:43:34+00:00"
     },
     "mhockey": {
       "status": "ok",
@@ -515,7 +515,7 @@
           "pts": "3"
         }
       ],
-      "updated_at": "2026-11-19T14:43:29+00:00"
+      "updated_at": "2026-11-20T14:43:34+00:00"
     },
     "summit_195": {
       "status": "error",
@@ -523,9 +523,55 @@
       "rows": []
     },
     "summit_193": {
-      "status": "error",
-      "error": "No team rows parsed for Summit League Softball",
-      "rows": []
+      "status": "ok",
+      "id": "summit_193",
+      "name": "Summit League Softball",
+      "source": "https://thesummitleague.org/standings.aspx?standings=193",
+      "rows": [
+        {
+          "rank": 1,
+          "team": "North Dakota State",
+          "acronym": "NDSU",
+          "conf": "0-0",
+          "ovr": "0-0"
+        },
+        {
+          "rank": 2,
+          "team": "Omaha",
+          "acronym": "OMA",
+          "conf": "0-0",
+          "ovr": "0-0"
+        },
+        {
+          "rank": 3,
+          "team": "Northern Colorado",
+          "acronym": "UNC",
+          "conf": "0-0",
+          "ovr": "0-0"
+        },
+        {
+          "rank": 4,
+          "team": "Oral Roberts",
+          "acronym": "ORU",
+          "conf": "0-0",
+          "ovr": "0-0"
+        },
+        {
+          "rank": 5,
+          "team": "South Dakota State",
+          "acronym": "SDSU",
+          "conf": "0-0",
+          "ovr": "0-0"
+        },
+        {
+          "rank": 6,
+          "team": "St. Thomas",
+          "acronym": "UST",
+          "conf": "0-0",
+          "ovr": "0-0"
+        }
+      ],
+      "updated_at": "2026-11-20T14:43:34+00:00"
     }
   }
 }
